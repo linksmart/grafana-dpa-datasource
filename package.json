@@ -1,5 +1,5 @@
 {
-  "name": "graphana-dpa-plugin",
+  "name": "grafana-dpa-plugin",
   "license": "Apache-2.0",
   "version": "1.0.0",
   "description": "",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://linksmart.eu/redmine/linksmart-opensource/linksmart-services/iot-data-processing-agent/graphana-dpa-plugin.git"
+    "url": "git+https://linksmart.eu/redmine/linksmart-opensource/linksmart-services/iot-data-processing-agent/grafana-dpa-plugin.git"
   },
   "author": "",
   "bugs": {

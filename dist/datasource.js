@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['lodash'], function (_export, _context) {
+System.register(['lodash', './external/jsonpath'], function (_export, _context) {
   "use strict";
 
-  var _, _createClass, GenericDatasource;
+  var _, jsonpath, _createClass, GenericDatasource;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -14,6 +14,8 @@ System.register(['lodash'], function (_export, _context) {
   return {
     setters: [function (_lodash) {
       _ = _lodash.default;
+    }, function (_externalJsonpath) {
+      jsonpath = _externalJsonpath.default;
     }],
     execute: function () {
       _createClass = function () {
@@ -49,20 +51,86 @@ System.register(['lodash'], function (_export, _context) {
         _createClass(GenericDatasource, [{
           key: 'query',
           value: function query(options) {
+
             var query = this.buildQueryParameters(options);
             query.targets = query.targets.filter(function (t) {
               return !t.hide;
             });
 
-            if (query.targets.length <= 0) {
-              return this.q.when({ data: [] });
-            }
+            var statementIds = query.targets.map(function (i) {
+              return i.id;
+            });
 
             return this.backendSrv.datasourceRequest({
-              url: this.url + '/query',
-              data: query,
-              method: 'POST',
+              url: this.url + '/statement//',
+              //data: interpolated,
+              method: 'GET',
               headers: { 'Content-Type': 'application/json' }
+            }).then(function (r) {
+              var data = _.entries(r.data.resources).map(function (p) {
+                return p[1];
+              }).filter(function (p) {
+                return statementIds.indexOf(p.ID) !== -1;
+              }).map(function (p) {
+                var t, v, jsonPathX, jsonPathY;
+
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                  for (var _iterator = query.targets[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var _t = _step.value;
+
+                    if (_t.id === p.ID) {
+                      jsonPathX = _t.jsonPathX;
+                      jsonPathY = _t.jsonPathY;
+                      break;
+                    }
+                  }
+                } catch (err) {
+                  _didIteratorError = true;
+                  _iteratorError = err;
+                } finally {
+                  try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                      _iterator.return();
+                    }
+                  } finally {
+                    if (_didIteratorError) {
+                      throw _iteratorError;
+                    }
+                  }
+                }
+
+                try {
+                  if (jsonPathX) {
+                    t = jsonpath.query(p.lastOutput.ResultValue, jsonPathX).map(function (x) {
+                      return new Date(x).getTime();
+                    });
+                  } else {
+                    t = [new Date(p.lastOutput.Time).getTime()];
+                  }
+
+                  if (jsonPathY) {
+                    v = jsonpath.query(p.lastOutput.ResultValue, jsonPathY);
+                  } else {
+                    v = [p.lastOutput.ResultValue];
+                  }
+
+                  return {
+                    'target': p.name, // The field being queried for
+                    'datapoints': _.zip(v, t)
+                  };
+                } catch (e) {
+                  // console.log('error', e)
+                  return false;
+                }
+              });
+
+              console.log(data);
+              r.data = data;
+              return r;
             });
           }
         }, {
@@ -104,28 +172,23 @@ System.register(['lodash'], function (_export, _context) {
         }, {
           key: 'metricFindQuery',
           value: function metricFindQuery(options) {
-            var target = typeof options === "string" ? options : options.target;
+            var target = typeof options === "string" ? options : options.name;
             var interpolated = {
               target: this.templateSrv.replace(target, null, 'regex')
             };
 
             return this.backendSrv.datasourceRequest({
-              url: this.url + '/search',
-              data: interpolated,
-              method: 'POST',
+              url: this.url + '/statement//',
+              //data: interpolated,
+              method: 'GET',
               headers: { 'Content-Type': 'application/json' }
             }).then(this.mapToTextValue);
           }
         }, {
           key: 'mapToTextValue',
           value: function mapToTextValue(result) {
-            return _.map(result.data, function (d, i) {
-              if (d && d.text && d.value) {
-                return { text: d.text, value: d.value };
-              } else if (_.isObject(d)) {
-                return { text: d, value: i };
-              }
-              return { text: d, value: d };
+            return _.entries(result.data.resources).map(function (p) {
+              return { text: p[1].name, value: p[0] };
             });
           }
         }, {
@@ -140,10 +203,13 @@ System.register(['lodash'], function (_export, _context) {
 
             var targets = _.map(options.targets, function (target) {
               return {
-                target: _this.templateSrv.replace(target.target),
+                id: _this.templateSrv.replace(target.id),
                 refId: target.refId,
                 hide: target.hide,
-                type: target.type || 'timeserie'
+                type: target.type || 'timeserie',
+
+                jsonPathX: target.jsonPathX,
+                jsonPathY: target.jsonPathY
               };
             });
 

@@ -5,14 +5,31 @@
     </div>
 
     <div class="gf-form" ng-if="ctrl.target.rawQuery">
-      <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.target" spellcheck="false" ng-blur="ctrl.onChangeInternal()" />
+      <textarea class="gf-form-input" rows="5" ng-model="ctrl.target.id" spellcheck="false" ng-blur="ctrl.onChangeInternal()"
+      />
     </div>
 
     <div ng-if="!ctrl.target.rawQuery">
       <div class="gf-form">
-        <metric-segment-model property="ctrl.target.target" get-options="ctrl.getOptions()" on-change="ctrl.onChangeInternal()"
-          css-class="tight-form-item-xxlarge"></metric-segment-model>
+        <metric-segment-model property="ctrl.target.id" get-options="ctrl.getOptions()" on-change="ctrl.onChangeInternal()" css-class="tight-form-item-xxlarge"></metric-segment-model>
       </div>
     </div>
+
+
+
   </div>
+  <div class="gf-form">
+    <span class="gf-form-label width-12">JSON Path - Timestamp</span>
+    <input type="text" class="gf-form-input width-30 ng-pristine ng-untouched ng-valid ng-not-empty" ng-change="ctrl.onChangeInternal()"
+      placeholder="Example: $[:].e[0].t" ng-model="ctrl.target.jsonPathX">
+  </div>
+
+  <div class="gf-form">
+    <span class="gf-form-label width-12">JSON Path - Value</span>
+    <input type="text" class="gf-form-input width-30 ng-pristine ng-untouched ng-valid ng-not-empty" ng-change="ctrl.onChangeInternal()"
+      placeholder="Example: $[:].e[0].v" ng-model="ctrl.target.jsonPathY">
+  </div>
+  <!--<pre>
+    {{ctrl.target.id | json}}
+  </pre>-->
 </query-editor-row>

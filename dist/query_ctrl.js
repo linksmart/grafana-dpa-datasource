@@ -68,15 +68,21 @@ System.register(['app/plugins/sdk', './css/query-editor.css!'], function (_expor
 
           _this.scope = $scope;
           _this.uiSegmentSrv = uiSegmentSrv;
-          _this.target.target = _this.target.target || 'select metric';
+          _this.target.id = _this.target.id || 'select metric';
           _this.target.type = _this.target.type || 'timeserie';
+
+          _this.target.jsonPathX = _this.target.jsonPathX || '';
+          _this.target.jsonPathY = _this.target.jsonPathY || '';
           return _this;
         }
 
         _createClass(GenericDatasourceQueryCtrl, [{
           key: 'getOptions',
           value: function getOptions() {
-            return this.datasource.metricFindQuery(this.target).then(this.uiSegmentSrv.transformToSegments(false));
+            return this.datasource.metricFindQuery(this.target).then(function (r) {
+              return r;
+            });
+            //.then(this.uiSegmentSrv.transformToSegments(true));
             // Options have to be transformed by uiSegmentSrv to be usable by metric-segment-model directive
           }
         }, {

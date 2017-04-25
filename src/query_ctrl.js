@@ -8,13 +8,19 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
 
     this.scope = $scope;
     this.uiSegmentSrv = uiSegmentSrv;
-    this.target.target = this.target.target || 'select metric';
+    this.target.id = this.target.id || 'select metric';
     this.target.type = this.target.type || 'timeserie';
+
+    this.target.jsonPathX = this.target.jsonPathX || '';
+    this.target.jsonPathY = this.target.jsonPathY || '';
   }
 
   getOptions() {
     return this.datasource.metricFindQuery(this.target)
-      .then(this.uiSegmentSrv.transformToSegments(false));
+      .then(r => {
+        return r;
+      })
+    //.then(this.uiSegmentSrv.transformToSegments(true));
       // Options have to be transformed by uiSegmentSrv to be usable by metric-segment-model directive
   }
 
@@ -25,7 +31,8 @@ export class GenericDatasourceQueryCtrl extends QueryCtrl {
   onChangeInternal() {
     this.panelCtrl.refresh(); // Asks the panel to refresh data.
   }
+
+
 }
 
 GenericDatasourceQueryCtrl.templateUrl = 'partials/query.editor.html';
-

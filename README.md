@@ -1,6 +1,6 @@
-# LinkSmart DPA - Grafana Datasource Plugin
+# Grafana Datasource Plugin for LinkSmart Data processing Agent
 
-This is a [Grafana](https://grafana.com/) datasource plugin for [LinkSmart® IoT Data-Processing Agent](https://linksmart.eu/redmine/projects/iot-data-processing-agent). It helps visualizing DPA statement results with [JSON Path](https://www.npmjs.com/package/JSONPath) query support to filter desired fields.
+This is a [Grafana](https://grafana.com/) datasource plugin for [LinkSmart Data Processing Agent](https://docs.linksmart.eu/display/LA). It helps visualizing DPA statement results with [JSON Path](https://www.npmjs.com/package/JSONPath) query support to filter desired fields.
 
 ## Installation
 
